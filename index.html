@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Emotional Analysis for Kids</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f8ff;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 90%;
+        max-width: 400px;
+      }
+
+      h1 {
+        color: #333;
+      }
+
+      textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        font-size: 16px;
+        resize: none;
+      }
+
+      button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      #result {
+        margin-top: 20px;
+      }
+
+      #result img {
+        width: 150px;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Emotional Analysis</h1>
+      <form id="sentiment-form">
+        <label for="text">Enter your text below:</label><br />
+        <textarea
+          id="text"
+          name="text"
+          rows="4"
+          cols="50"
+          placeholder="Type something..."
+        ></textarea
+        ><br />
+        <button type="submit">Analyze Emotion</button>
+      </form>
+      <div id="result"></div>
+    </div>
+
+    <script>
+      document
+        .getElementById("sentiment-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          analyzeSentiment();
+        });
+
+      function analyzeSentiment() {
+        const formData = new FormData(
+          document.getElementById("sentiment-form")
+        );
+        const text = formData.get("text");
+
+        fetch("http://127.0.0.1:5000/predict", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text: text }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            displayResult(data.emotion);
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      function displayResult(emotion) {
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = "";
+
+        let imgSrc;
+        if (emotion === "joy") {
+          imgSrc = "https://via.placeholder.com/150/00ff00?text=Joy"; // Joy Image
+        } else if (emotion === "anger") {
+          imgSrc = "https://via.placeholder.com/150/ff0000?text=Anger"; // Anger Image
+        } else if (emotion === "fear") {
+          imgSrc = "https://via.placeholder.com/150/0000ff?text=Fear"; // Fear Image
+        } else {
+          imgSrc = "https://via.placeholder.com/150/cccccc?text=Neutral"; // Neutral Image
+        }
+
+        const img = document.createElement("img");
+        img.src = imgSrc;
+        img.alt = emotion;
+
+        resultDiv.appendChild(img);
+        resultDiv.appendChild(document.createElement("br"));
+        resultDiv.appendChild(document.createTextNode("Emotion: " + emotion));
+      }
+    </script>
+  </body>
+</html>
